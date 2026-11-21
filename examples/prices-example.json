@@ -1,0 +1,1 @@
+{"_comment":"USER-SUPPLIED list-price estimates, per 1M tokens, USD. These are example numbers only -- replace them with the prices from your own provider invoice or pricing page. agent-fail-spend never hard-codes model prices.","claude-sonnet-4-5":{"cache_creation":3.75,"cache_read":0.3,"input":3.0,"output":15.0}}

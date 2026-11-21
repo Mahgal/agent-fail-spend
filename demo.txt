@@ -1,0 +1,19 @@
+agent-fail-spend  --  spend by run outcome
+
+session                            outcome        cost     tokens duration
+--------------------------------------------------------------------------
+claude-failed.jsonl                failed        $1.87      66000     5.0m
+claude-nocost.jsonl                unknown     unknown       4500        -
+claude-passed.jsonl                passed        $0.42       7200      45s
+claude-timeout.jsonl               timeout       $0.95      72500    10.0m
+--------------------------------------------------------------------------
+sessions: 4  (passed 1, failed 1, timeout 1, unknown 1)
+total spend:   $3.24
+passed spend:  $0.42
+failed spend:  $1.87
+timeout spend: $0.95
+sessions with unknown cost: 1 (no embedded cost, no prices file)
+wasted on failed runs: 57.7% of known spend
+
+most expensive failed sessions (top 5):
+  $1.87  claude-failed.jsonl

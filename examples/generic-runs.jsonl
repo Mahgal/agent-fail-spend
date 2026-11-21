@@ -1,0 +1,4 @@
+{"id": "run-001", "status": "pass", "cost_usd": 0.10, "model": "gpt-5", "duration_ms": 12000}
+{"id": "run-002", "status": "failed", "cost_usd": 2.50, "model": "gpt-5", "duration_ms": 240000}
+{"id": "run-003", "status": "timed_out", "cost_usd": 0.75, "model": "gpt-5", "duration_ms": 600000}
+{"id": "run-004", "outcome": "error", "cost_usd": 0.30, "model": "gpt-5", "duration_ms": 90000}

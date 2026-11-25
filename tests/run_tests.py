@@ -208,6 +208,69 @@ def test_top_n_flag():
     assert out.count("most expensive failed sessions (top 1)") == 1
 
 
+@test
+def test_retrofit_duration_seconds_conversion():
+    # Generic log: duration_seconds is converted to ms (x1000).
+    with tempfile.TemporaryDirectory() as td:
+        path = os.path.join(td, "runs.jsonl")
+        with open(path, "w") as fh:
+            fh.write('{"id": "run-a", "status": "passed", "cost_usd": 0.10,'
+                     ' "tokens": 100, "duration_seconds": 90}\n')
+            fh.write('{"id": "run-b", "status": "failed", "cost_usd": 0.20,'
+                     ' "tokens": 200, "duration_ms": 5000}\n')
+        sessions, bad = afs.parse_generic_log(path)
+        assert bad == 0
+        assert sessions[0].duration_ms == 90000, sessions[0].duration_ms
+        assert sessions[1].duration_ms == 5000, sessions[1].duration_ms
+
+
+@test
+def test_retrofit_is_error_flag_counts_failed():
+    # A "success" subtype with is_error set is still a failed run.
+    with tempfile.TemporaryDirectory() as td:
+        path = os.path.join(td, "s.jsonl")
+        with open(path, "w") as fh:
+            fh.write('{"type": "result", "subtype": "success",'
+                     ' "is_error": true, "total_cost_usd": 0.33}\n')
+        s, bad = afs.parse_claude_transcript(path, None)
+        assert bad == 0
+        assert s.outcome == "failed", s.outcome
+        approx(s.cost_usd, 0.33)
+
+
+@test
+def test_retrofit_error_dict_timeout_message():
+    # Timeout signalled only inside an error dict's message counts as timeout.
+    with tempfile.TemporaryDirectory() as td:
+        path = os.path.join(td, "s.jsonl")
+        with open(path, "w") as fh:
+            fh.write('{"type": "result", "subtype": "error",'
+                     ' "error": {"message": "Execution timed out after 600s"},'
+                     ' "total_cost_usd": 0.75}\n')
+        s, bad = afs.parse_claude_transcript(path, None)
+        assert bad == 0
+        assert s.outcome == "timeout", s.outcome
+        approx(s.cost_usd, 0.75)
+
+
+@test
+def test_retrofit_duration_rendering_boundaries():
+    assert afs._dur_str(None) == "-"
+    assert afs._dur_str(45000) == "45s"
+    assert afs._dur_str(59000) == "59s"
+    assert afs._dur_str(60000) == "1.0m"
+    assert afs._dur_str(300000) == "5.0m"
+    assert afs._dur_str(0) == "0s"
+
+
+@test
+def test_retrofit_bad_prices_file_exit_2():
+    code, out, err = run_main(
+        ["--demo", "--prices", "/nonexistent/prices-xyz.json"])
+    assert code == 2, (code, out, err)
+    assert "cannot read prices file" in err
+
+
 def main():
     passed = failed = 0
     for fn in TESTS:

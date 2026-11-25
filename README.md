@@ -2,7 +2,7 @@
 
 ![demo](demo.png)
 
-**Your coding agent spent $3.24 on four sessions. $1.87 of it died on runs that never passed. This tool shows you that split, session by session, in 0.05 seconds.**
+**Your coding agent spent $3.24 on four sessions. $1.87 of it died on runs that never passed. This tool shows you that split, session by session, in 0.06 seconds.**
 
 It reads your Claude Code session transcripts (or any generic JSONL run log) and reports spend by run outcome: passed, failed, timeout, unknown. The headline is the wasted share. On the bundled synthetic fixtures, 57.7% of known spend went to failed runs. Those fixtures are labelled test data, not real spend, and the figure exists to show what the report looks like, not what your bill says.
 
@@ -13,6 +13,8 @@ Runta published FrontierHarness Eval v1.1 on 2026-11-17, and it topped Hacker Ne
 First, 64.5% of list-price cost went to trials that did not pass: 52.7% failures plus 11.8% timeouts. Second, 68–82% of failed runs ended with a confident final answer, not a timeout, and higher cost did not predict higher pass rates. The money is going somewhere, and the runs that eat it look finished when they fail.
 
 Most developers only ever see one monthly total. That total hides the split. This tool makes the split visible, per session, from files already on your disk.
+
+**Status 2026-11-24:** the agent toolchain is still the hottest theme on GitHub — today's Trending daily list is led by agent skills and plugins (Claude-BugHunter #1; cursor/plugins #5, +397 stars in a day), and the weekly #1 is an agent collaboration workbench. Every new agent that lands in a workflow adds sessions to somebody's bill, and none of them itemise the waste. Source: GitHub Trending, read 2026-11-24 14:08 CST (see the day's scout report for the full list).
 
 Source: [Runta — Introducing FrontierHarness Eval](https://runta.com/blog/introducing-frontierharness-eval)
 
@@ -33,7 +35,7 @@ python3 agent_fail_spend.py --dir ~/.claude/projects --prices examples/prices-ex
 python3 agent_fail_spend.py --format generic --file runs.jsonl
 ```
 
-Verified from a clean copy (fresh copy in `/tmp`, 2026-11-21): `--demo` runs and the full test suite passes, 13/13, exit 0; the demo output is byte-identical to `demo.txt`. The demo runs in a median **0.0500 s** (7 runs, measured 2026-11-21 on this machine).
+Verified from a clean copy (fresh copy in `/tmp`, 2026-11-24): `--demo` runs and the full test suite passes, 18/18, exit 0; the demo output is byte-identical to `demo.txt`. The demo runs in a median **0.0562 s** (7 runs, measured 2026-11-24 on this machine).
 
 ## Example output
 
@@ -87,10 +89,10 @@ Outcome classification is a heuristic for transcripts without a `result` message
 ## Tests
 
 ```bash
-python3 tests/run_tests.py   # 13 tests, stdlib only, exit 0
+python3 tests/run_tests.py   # 18 tests, stdlib only, exit 0
 ```
 
-Coverage includes result-message parsing, usage aggregation across messages, outcome classification including synonyms, pricing math against the example prices file, malformed-line tolerance, an empty directory, missing-cost handling, demo determinism (two runs, identical sha256), and the hand-computed fixture totals asserted in `tests/run_tests.py`.
+Coverage includes result-message parsing, usage aggregation across messages, outcome classification including synonyms, pricing math against the example prices file, malformed-line tolerance, an empty directory, missing-cost handling, demo determinism (two runs, identical sha256), and the hand-computed fixture totals asserted in `tests/run_tests.py`. The 2026-11-24 refresh added 5 tests: `duration_seconds` conversion in generic logs, `is_error` on a success subtype counting as failed, a timeout carried only in an error-dict message, duration-rendering boundaries (`-` / `45s` / `5.0m`), and a bad prices file exiting 2.
 
 ## License
 
